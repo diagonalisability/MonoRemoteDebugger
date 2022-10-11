@@ -22,7 +22,7 @@ namespace MonoRemoteDebugger.SharedLib.Server
                 handler(this, EventArgs.Empty);
         }
 
-        protected string GetProcessArgs()
+        protected string GetMonoDebuggerArgs()
         {
             IPAddress ip = IPAddress.Any;
             string args =

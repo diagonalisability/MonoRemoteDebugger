@@ -12,7 +12,7 @@ namespace MonoRemoteDebugger.SharedLib.Server
         internal override Process Start(string workingDirectory)
         {
             string monoBin = MonoUtils.GetMonoXsp4();
-            string args = GetProcessArgs();
+            string args = GetMonoDebuggerArgs();
             ProcessStartInfo procInfo = GetProcessStartInfo(workingDirectory, monoBin);
 
             procInfo.Arguments = Arguments;

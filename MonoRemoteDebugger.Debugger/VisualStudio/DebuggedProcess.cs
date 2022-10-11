@@ -339,8 +339,8 @@ namespace Microsoft.MIDebugEngine
                     _vm = null;
                 }
 
-
-                session.Disconnect();
+                if (session != null)
+                    session.Disconnect();
             }
             catch
             {

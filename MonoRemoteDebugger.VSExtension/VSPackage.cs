@@ -160,7 +160,7 @@ namespace MonoRemoteDebugger.VSExtension
                 using (server = new MonoDebugServer())
                 {
                     server.Start();
-                    await monoExtension.AttachDebuggerAsync(MonoProcess.GetLocalIp().ToString());
+                    await monoExtension.AttachDebuggerAsync(MonoProcess.GetLocalIp().ToString(), true);
                 }
             }
             catch (Exception ex)
@@ -182,10 +182,14 @@ namespace MonoRemoteDebugger.VSExtension
                 {
                     int timeout = dlg.ViewModel.AwaitTimeout;
                     monoExtension.BuildSolution();
-                    if (dlg.ViewModel.SelectedServer != null)
-                        await monoExtension.AttachDebuggerAsync(dlg.ViewModel.SelectedServer.IpAddress.ToString(), timeout);
-                    else if (!string.IsNullOrWhiteSpace(dlg.ViewModel.ManualIp))
-                        await monoExtension.AttachDebuggerAsync(dlg.ViewModel.ManualIp, timeout);
+                    bool isSendingBinaries = dlg.ViewModel.ShouldUploadBinariesToDebuggingServer;
+                    await monoExtension.AttachDebuggerAsync(
+                        dlg.ViewModel.SelectedServer == null
+                            ? dlg.ViewModel.ManualIp
+                            : dlg.ViewModel.SelectedServer.IpAddress.ToString(),
+                        dlg.ViewModel.ShouldUploadBinariesToDebuggingServer,
+                        timeout
+                    );
                 }
                 catch (Exception ex)
                 {

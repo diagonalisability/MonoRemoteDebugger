@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -131,7 +131,7 @@ namespace MonoRemoteDebugger.VSExtension
             return null;
         }
 
-        internal async Task AttachDebuggerAsync(string ipAddress, int timeout=10000)
+        internal async Task AttachDebuggerAsync(string ipAddress, bool ShouldUploadBinariesToDebuggingServer, int timeout=10000)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
             Project startupProject = GetStartupProject();
@@ -147,13 +147,17 @@ namespace MonoRemoteDebugger.VSExtension
                 outputDirectory += @"\..\..\";
 
             var client = new DebugClient(appType, targetExe, arguments, outputDirectory, appHash);
-            DebugSession session = await client.ConnectToServerAsync(ipAddress);
-            var debugSessionStarted = await session.RestartDebuggingAsync(timeout);
 
-            if (!debugSessionStarted)
+            DebugSession session = null;
+            if (ShouldUploadBinariesToDebuggingServer)
             {
-                await session.TransferFilesAsync();
-                await session.WaitForAnswerAsync(timeout);
+                session = await client.ConnectToServerAsync(ipAddress);
+                var debugSessionStarted = await session.RestartDebuggingAsync(timeout);
+                if (!debugSessionStarted)
+                {
+                    await session.TransferFilesAsync();
+                    await session.WaitForAnswerAsync(timeout);
+                }
             }
 
             IntPtr pInfo = GetDebugInfo(ipAddress, targetExe, outputDirectory);
@@ -164,7 +168,8 @@ namespace MonoRemoteDebugger.VSExtension
                 int hr = dbg.LaunchDebugTargets(1, pInfo);
                 Marshal.ThrowExceptionForHR(hr);
 
-                DebuggedProcess.Instance.AssociateDebugSession(session);
+                if (ShouldUploadBinariesToDebuggingServer)
+                    DebuggedProcess.Instance.AssociateDebugSession(session);
             }
             catch(Exception ex)
             {

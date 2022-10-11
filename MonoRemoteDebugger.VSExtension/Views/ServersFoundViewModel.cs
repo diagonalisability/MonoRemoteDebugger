@@ -1,4 +1,4 @@
-﻿using MonoRemoteDebugger.SharedLib;
+using MonoRemoteDebugger.SharedLib;
 using MonoRemoteDebugger.VSExtension.MonoClient;
 using MonoRemoteDebugger.VSExtension.Settings;
 using System;
@@ -21,6 +21,7 @@ namespace MonoRemoteDebugger.VSExtension.Views
             UserSettings settings = UserSettingsManager.Instance.Load();
             ManualIp = settings.LastIp;
             AwaitTimeout = settings.LastTimeout;
+            ShouldUploadBinariesToDebuggingServer = settings.ShouldUploadBinariesToDebuggingServer;
             var task = LookupServersAsync(cts.Token);
         }
 
@@ -28,6 +29,7 @@ namespace MonoRemoteDebugger.VSExtension.Views
         public MonoServerInformation SelectedServer { get; set; }
         public string ManualIp { get; set; }
         public int AwaitTimeout { get; set; }
+        public bool ShouldUploadBinariesToDebuggingServer { get; set; }
 
         public int ServerPort
         {
@@ -102,6 +104,7 @@ namespace MonoRemoteDebugger.VSExtension.Views
         {
             UserSettings settings = UserSettingsManager.Instance.Load();
             settings.LastIp = ManualIp;
+            settings.ShouldUploadBinariesToDebuggingServer = ShouldUploadBinariesToDebuggingServer;
             //Check if value of timeout is greater than 0 before save. If not set default 10sec.
             settings.LastTimeout = AwaitTimeout > 0 ? AwaitTimeout : 10000;
             UserSettingsManager.Instance.Save(settings);
