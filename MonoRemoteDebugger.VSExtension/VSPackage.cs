@@ -182,7 +182,6 @@ namespace MonoRemoteDebugger.VSExtension
                 {
                     int timeout = dlg.ViewModel.AwaitTimeout;
                     monoExtension.BuildSolution();
-                    bool isSendingBinaries = dlg.ViewModel.ShouldUploadBinariesToDebuggingServer;
                     await monoExtension.AttachDebuggerAsync(
                         dlg.ViewModel.SelectedServer == null
                             ? dlg.ViewModel.ManualIp
